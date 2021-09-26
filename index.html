@@ -1,0 +1,412 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<meta http-equiv="content-type" content="text/html;charset=utf-8" />
+<head>
+		<title>Athlethicz</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		
+		<meta http-equiv="Expires" content="0">
+		<meta http-equiv="Last-Modified" content="0">
+		<meta http-equiv="Cache-Control" content="no-cache, mustrevalidate">
+		<meta http-equiv="Pragma" content="no-cache">
+		
+		<style>
+			body {
+				font-family: Monospace;
+				background-color: #f3f4f6;
+				color: #fff;
+				margin: 0px;
+				overflow: hidden;
+			}
+			#info {
+				color: #fff;
+				position: absolute;
+				top: 10px;
+				width: 100%;
+				text-align: center;
+				z-index: 100;
+				display:block;
+			}
+			#info a, .button { color: #f00; font-weight: bold; text-decoration: underline; cursor: pointer }
+		</style>
+	</head>
+
+	<body>
+		 
+		<script src="bld/three.min.js_%3b%20filename_%3dUTF-8%27%27three.min.js"></script>
+		<script src="js/cts/CustomOrbitControls.js"></script>
+		<script src="js/uts/utils.js_%3b%20filename_%3dUTF-8%27%27utils.js"></script>
+		<script src="js/lds/OBJLoader.js_%3b%20filename_%3dUTF-8%27%27OBJLoader.js"></script>
+
+		<script>
+
+			var container;
+
+			var camera, scene, renderer,controls;
+			var scenePos = new THREE.Vector3();
+			var mouseX = 0, mouseY = 0;
+
+			var windowHalfX = window.innerWidth / 2;
+			var windowHalfY = window.innerHeight / 2;
+		 	var cube;
+
+			init();
+			animate();
+
+
+			function init() {
+
+				container = document.createElement( 'div' );
+				document.body.appendChild( container );
+/*
+//camera_test
+				camera = new THREE.PerspectiveCamera( 45, width / height, 1, 1000 );
+
+				scene.add( camera );
+*/
+
+//camera_definition		
+			
+                camera = new THREE.PerspectiveCamera( 90, window.innerWidth / window.innerHeight, 1, 4000 );
+                camera.position.set( 500,160,0);
+     // IR A CUSTOMORBITCONTROLS.JS PARA DEFINIR TARGET... AQUI NO VA EL CAMERA.LOOKAT  
+				// camera.lookAt( 0, 160, 0 );
+			/*  
+
+				camera.position.x = 0;
+				camera.position.y = 0;
+				camera.position.z = 0;
+			*/	
+//orbitcontrols 
+				controls = new THREE.OrbitControls( camera );	 
+				controls.enableDamping = true;
+				controls.dampingFactor = 0.25;
+				controls.enableZoom = true;
+                //controls.minPolarAngle = Math.PI/4;
+                //controls.minPolarAngle = Math.PI * 0.42;
+                //controls.maxPolarAngle = Math.PI * 0.7;
+                //controls.maxPolarAngle = Math.PI/2;
+                //controls.maxPolarAngle = Math.PI * 0.58;
+                
+                
+                //controls.autoRotate = true;
+                controls.rotateSpeed = 0.18;
+                
+                //this is actually zoom
+                controls.minDistance = 100;
+                controls.maxDistance = 5000;
+                controls.zoomSpeed = 0.5
+                
+                //PATH 2
+                controls.autoRotateSpeed = 0.10;
+                controls.autoRotate = false;
+	
+// scene
+
+				scene = new THREE.Scene();
+				scenePos.copy(scene.position); // Salvamos la posicion de base
+
+/*
+				scenePos.copy(camera.position); // Salvamos la posicion de base				
+				scenePos.z = 0;
+
+				camera.lookAt( scenePos );
+ */				 
+ 
+/*					
+//cube_helper
+				var geometry = new THREE.BoxGeometry( 30, 30, 30 );
+				var material = new THREE.MeshBasicMaterial( {color: 0x00ff00} );
+				cube = new THREE.Mesh( geometry, material );
+				scene.add( cube );
+				
+				cube.position.x = 500;
+				cube.position.y = 160;
+				cube.position.z = -500;
+				
+*/				
+				
+				//Añadimos diferentes luces a la escena para crear los brillos--------------------
+				var FillLight = new THREE.DirectionalLight( 0xffffff, 0.1 );
+				FillLight.position.set( 100, 50, -100 );
+				scene.add( FillLight );
+				
+				var FillLight2 = new THREE.DirectionalLight( 0xffffff, 0.1 );
+				FillLight2.position.set( -100, 50, -100 );
+				scene.add( FillLight2 );
+				
+				var MainLight = new THREE.DirectionalLight( 0xffffff, 0.125 );
+				MainLight.position.set( 200, 200, -100 );
+			scene.add( MainLight );
+
+
+                //-----------------
+                //var directionalLight = new THREE.DirectionalLight( 0xff0000 );
+                //directionalLight.position.set( 0, 0, 1 );
+                //scene.add( directionalLight );
+                //-----------------
+
+
+				// texture
+
+				var manager = new THREE.LoadingManager();
+				manager.onProgress = function ( item, loaded, total ) {
+
+					console.log( item, loaded, total );
+
+				};
+
+				var texture = new THREE.Texture();
+                var texture2 = new THREE.Texture();
+                var texture3 = new THREE.Texture();
+
+				var onProgress = function ( xhr ) {
+					if ( xhr.lengthComputable ) {
+						var percentComplete = xhr.loaded / xhr.total * 100;
+						console.log( Math.round(percentComplete, 2) + '% downloaded' );
+					}
+				};
+
+				var onError = function ( xhr ) {
+				};
+var glo = new THREE.MeshPhongMaterial({
+								map: texture,
+								bumpMap: texture,
+								bumpScale: 0.4,
+								emissive:0x0,
+								color: 0xdcdcdc,
+								specular: 0x0b0b0b,
+								reflectivity: 1,
+								shininess: 90,
+					lightMap:texture3,
+								shading: THREE.SmoothShading,
+				} );
+				
+				var set = new THREE.MeshPhongMaterial({
+								map: texture2,
+								bumpScale: 0.2,
+								emissive:0x0,
+								color: 0xdcdcdc,
+								specular: 0xffffff,
+								reflectivity: 0,
+								shininess: 0,
+					lightMap:texture3,
+								shading: THREE.SmoothShading,
+				} );
+
+				var loader = new THREE.ImageLoader( manager );
+				//loader.load( 'models/modelo/ext27a_sti00_01.jpg_%3b%20filename_%3dUTF-8%27%27ext27a_sti00_01.jpg', function ( image ) {
+                //loader.load( 'models/modelo/urbanSimulations_look07_04_mr00A.jpg', function ( image ) {
+                //loader.load( 'models/modelo/zw07_04a.jpg', function ( image ) {
+                loader.load( 'mod/bit_000.jpg', function ( image ) {
+
+					texture.image = image;
+					texture.needsUpdate = true;
+
+				} );
+
+				var loader = new THREE.ImageLoader( manager );
+				
+                loader.load( 'mod/LM.jpg', function ( image ) {
+
+					texture3.image = image;
+					texture3.needsUpdate = true;
+
+				} );
+				// model
+
+				var loader = new THREE.OBJLoader( manager );
+				//loader.load( './models/modelo/tes00e.obj', function ( object ) {
+                //loader.load( './models/modelo/tes_box00.obj', function ( object ) {
+                //loader.load( './models/modelo/look07.obj', function ( object ) {
+                loader.load( './mod/set_001a.obj', function ( object ) {
+
+					object.traverse( function ( child ) {
+
+						if ( child instanceof THREE.Mesh ) {
+
+							child.material = glo;
+
+						}
+
+					} );
+                    //THREE.GeometryUtils.center( geometry );
+					//object.position.y = -100;
+                    // object.zoom = 10;
+                    // funciona pero no lo controlo object.scale.set (0.39,0.39,0.39);
+                    //no funciona object.scale.set = (0.39,0.39,0.39);
+                  	//no funciona mesh.scale.set(0.5,0.5,0.5);
+					scene.add( object );
+
+				}, onProgress, onError );
+                
+                // aux set model tex
+                
+                var loader = new THREE.ImageLoader( manager );
+                
+                //loader.load( 'models/modelo/col_white.jpg', function ( image ) {
+                //loader.load( 'models/modelo/col_white.jpg', function ( image ) {
+                loader.load( 'mod/Look10_04_set.jpg', function ( image ) {
+                            
+                            texture2.image = image;
+                            texture2.needsUpdate = true;
+                            
+                            } );
+                
+                
+               /* // aux set model base tex
+                var loader = new THREE.ImageLoader( manager );
+                
+                loader.load( 'models/modelo/in_boA000_no00.JPG', function ( image ) {
+                            
+                            texture3.image = image;
+                            texture3.needsUpdate = true;
+                            
+                            } );*/
+                
+                // aux set model
+                
+               /* var loader = new THREE.OBJLoader( manager );
+                
+                loader.load( './mod/set000.obj', function ( object ) {
+                            
+                            object.traverse( function ( child ) {
+                                            
+                                            if ( child instanceof THREE.Mesh ) {
+                                            
+                                            child.material = set;
+                                            
+                                            }
+                                            
+                                            } );
+
+                            object.position.y = -85;
+                            object.zoom = 10;
+                            scene.add( object );
+                            
+                            }, onProgress, onError );
+
+                            */
+                
+              /*  // aux set model base
+                var loader = new THREE.OBJLoader( manager );
+                
+                loader.load( './models/modelo/setA00.obj', function ( object ) {
+                            
+                            object.traverse( function ( child ) {
+                                            
+                                            if ( child instanceof THREE.Mesh ) {
+                                            
+                                            child.material.map = texture3;
+                                            
+                                            }
+                                            
+                                            } );
+
+                            object.position.y = -85;
+                            object.zoom = 10;
+                            scene.add( object );
+                            
+                            }, onProgress, onError );*/
+
+				//
+
+				renderer = new THREE.WebGLRenderer({antialias:true});
+				renderer.autoClear = false;
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.setClearColor( 0x000000 );
+				container.appendChild( renderer.domElement );
+
+				//document.addEventListener( 'mousemove', onDocumentMouseMove, false );
+
+				//
+
+				window.addEventListener( 'resize', onWindowResize, false );
+				/*
+				var helper = new THREE.GridHelper( 1000, 100 );
+				helper.position.y = -100;
+				helper.material.opacity = 0.25;
+				helper.material.transparent = true;
+				scene.add( helper );
+
+				var helper2= new THREE.GridHelper( 1000, 100 );
+				helper2.position.y = 120;
+				helper2.material.opacity = 0.25;
+				helper2.material.transparent = true;
+				scene.add( helper2 );
+				*/
+				 
+
+			}
+
+			function onWindowResize() {
+
+				windowHalfX = window.innerWidth / 2;
+				windowHalfY = window.innerHeight / 2;
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+			}
+
+			function onDocumentMouseMove( event ) {
+
+				mouseX = ( event.clientX - windowHalfX ) / 2;
+				mouseY = ( event.clientY - windowHalfY ) / 2;
+			}
+
+			//
+
+			function animate() {
+
+				requestAnimationFrame( animate );
+
+				 
+				/*
+				scenePos.x = 0;
+				scenePos.y += 0.1;
+				scenePos.z = 0;
+ 			 	*/
+
+				render();
+
+			}
+
+			function render() {
+				
+				/*camera.position.x += ( mouseX - camera.position.x ) * .05;
+				camera.position.y += ( - mouseY - camera.position.y ) * .05;
+*/
+				//scenePos.y += 0.10 * controls.deltaRotVer; 
+				//scenePos.y += controls.deltaRotVer; 
+				//camera.position = scenePos;
+
+				//cube.position.y = scenePos.y;
+				//console.log(scenePos);
+				 
+				controls.update();
+				//camera.up = new THREE.Vector3(0,1,0);
+ 				//camera.lookAt( scenePos );
+ 				//camera.lookAt( new THREE.Vector3(0,0,0));
+  				
+
+  				//camera.position.y = scenePos.y;
+  				//camera.lookAt( scenePos );
+
+
+				//camera.lookAt( scene.position );
+				renderer.render( scene, camera );
+
+			}
+
+		</script>
+
+	</body>
+
+<!-- Mirrored from dl.dropboxusercontent.com/u/978567/demo_zara/web/Zara copia.html by HTTrack Website Copier/3.x [XR&CO'2014], Sun, 06 Mar 2016 00:12:06 GMT -->
+</html>
